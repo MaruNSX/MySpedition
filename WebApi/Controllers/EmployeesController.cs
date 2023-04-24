@@ -122,5 +122,39 @@ namespace WebApi.Controllers
 
             return new OkResult();
         }
+
+        [HttpDelete]
+        public IActionResult Delete(int? id)
+        {
+            if (!id.HasValue)
+            {
+                _logger.LogError("Id has to be filled in.");
+                return new BadRequestObjectResult("Employee id has to be provided.");
+            }
+
+            using (var db = new DatabaseContext())
+            {
+                _logger.LogInformation($"Trying to fetch employee with id: {id.Value}");
+                var employee = db.Employees.FirstOrDefault(x => x.Id == id.Value);
+                if (employee == null)
+                {
+                    _logger.LogError($"Employee with id {id.Value} does not exists");
+                    return new NotFoundObjectResult($"Employee with id {id.Value} could not be found.");
+                }
+                _logger.LogInformation($"Fetch employees orders.");
+                var orders = db.Orders.Where(x => x.Employee.Id == id.Value); 
+                if (orders.Any())
+                {
+                    _logger.LogError($"Before removing employee, first remove it's orders! Order ids assigned to employee: {string.Join(", ", orders.Select(x => x.Id.ToString()))}");
+                    return new BadRequestObjectResult($"Before removing employee, first remove it's orders! Order ids assigned to employee: {string.Join(", ", orders.Select(x => x.Id.ToString()))}");
+                }
+
+                _logger.LogInformation("Removing employee");
+                db.Employees.Remove(employee);
+                db.SaveChanges();
+            }
+
+            return new OkResult();
+        }
     }
 }

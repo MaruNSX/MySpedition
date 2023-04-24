@@ -133,5 +133,32 @@ namespace WebApi.Controllers
 
             return new OkResult();
         }
+
+        [HttpDelete]
+        public IActionResult Delete(int? id)
+        {
+            if (!id.HasValue)
+            {
+                _logger.LogError("Id has to be filled in.");
+                return new BadRequestObjectResult("Order id has to be provided.");
+            }
+
+            using (var db = new DatabaseContext())
+            {
+                _logger.LogInformation($"Trying to fetch order with id: {id.Value}");
+                var order = db.Orders.FirstOrDefault(x => x.Id == id.Value);
+                if (order == null)
+                {
+                    _logger.LogError($"Order with id {id.Value} does not exists");
+                    return new NotFoundObjectResult($"Order with id {id.Value} could not be found.");
+                }
+
+                _logger.LogInformation("Removing order");
+                db.Orders.Remove(order);
+                db.SaveChanges();
+            }
+
+            return new OkResult();
+        }
     }
 }
