@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using WebApi.Database;
 using WebApi.Models;
@@ -21,10 +22,10 @@ namespace WebApi.Controllers
         {
             using (var db = new DatabaseContext())
             {
-                var query = db.Employees;
+                var query = db.Employees.AsSingleQuery();
                 if (id.HasValue)
                 {
-                    query.Where(x => x.Id == id);
+                    query = query.Where(x => x.Id == id);
                 }
                 var employees = query.ToList();
                 if (!employees.Any())
