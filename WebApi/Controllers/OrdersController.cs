@@ -51,7 +51,7 @@ namespace WebApi.Controllers
                 !request.Price.HasValue ||
                 !request.EmployeeId.HasValue ||
                 string.IsNullOrWhiteSpace(request.StartCity) ||
-                string.IsNullOrWhiteSpace(request.Destination)
+                string.IsNullOrWhiteSpace(request.Destination))
             {
                 _logger.LogError($"Some of input parameters are not filled in: Parameters:" +
                     $"StartTime: {request.StartTime}," +
