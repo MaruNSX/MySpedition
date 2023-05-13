@@ -49,13 +49,17 @@ namespace WebApi.Controllers
             if (!request.StartTime.HasValue ||
                 !request.EndTime.HasValue ||
                 !request.Price.HasValue ||
-                !request.EmployeeId.HasValue)
+                !request.EmployeeId.HasValue ||
+                string.IsNullOrWhiteSpace(request.StartCity) ||
+                string.IsNullOrWhiteSpace(request.Destination)
             {
                 _logger.LogError($"Some of input parameters are not filled in: Parameters:" +
                     $"StartTime: {request.StartTime}," +
                     $"EndTime: {request.EndTime}," +
                     $"Price: {request.Price}," +
-                    $"EmployeeId: {request.EmployeeId}");
+                    $"EmployeeId: {request.EmployeeId}," +
+                    $"StartCity: {request.StartCity}," +
+                    $"Destination: {request.Destination}");
                 return new BadRequestObjectResult("All fields have to be filled in!");
             }
 
@@ -73,7 +77,9 @@ namespace WebApi.Controllers
                     StartTime = request.StartTime.Value,
                     EndTime = request.EndTime.Value,
                     Price = request.Price.Value,
-                    Employee = employee
+                    Employee = employee,
+                    StartCity = request.StartCity,
+                    Destination = request.Destination,
                 };
                 db.Orders.Add(order);
                 db.SaveChanges();
@@ -115,6 +121,17 @@ namespace WebApi.Controllers
                     _logger.LogInformation($"Assigning price: {request.Price}");
                     order.Price = request.Price.Value;
                 }
+                if (!string.IsNullOrWhiteSpace(request.StartCity))
+                {
+                    _logger.LogInformation($"Assigning start city: {request.StartCity}");
+                    order.StartCity = request.StartCity;
+                }
+                if (!string.IsNullOrWhiteSpace(request.Destination))
+                {
+                    _logger.LogInformation($"Assigning destination: {request.Destination}");
+                    order.Destination = request.Destination;
+                }
+
                 if (request.EmployeeId.HasValue)
                 {
                     var employee = db.Employees.FirstOrDefault(x => x.Id == request.EmployeeId);

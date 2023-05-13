@@ -15,6 +15,8 @@ CREATE TABLE Orders
 	StartTime DateTime,
 	EndTime DateTime,
 	EmployeeId int FOREIGN KEY REFERENCES Employees(Id),
-	Price decimal not null
+	Price decimal not null,
+	StartCity nvarchar(255) NOT NULL,
+	Destination nvarchar(255) NOT NULL,
 )
 
